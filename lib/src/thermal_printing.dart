@@ -60,8 +60,6 @@ class ThermalPrint {
   /// Print receipt
   Future<void> printReceipt({
     required Uint8List bytes,
-    required int length,
-    required int width,
     String name = 'default',
   }) async {
     if (await bluetoothConnected) {
