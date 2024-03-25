@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'package:esc_pos_printer/esc_pos_printer.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
-
+import 'package:esc_pos_utils/esc_pos_utils.dart';
 
 /// ThermalPrint class
 class ThermalPrint {
@@ -18,7 +18,6 @@ class ThermalPrint {
       isBluetoothDevice &&
       await PrintBluetoothThermal.bluetoothEnabled &&
       await PrintBluetoothThermal.connectionStatus;
-
 
   /// Get the list of print devices
   Future<List<Map>> getPrintDevices() async {
@@ -60,16 +59,23 @@ class ThermalPrint {
   /// Print receipt
   Future<void> printReceipt({
     required Uint8List bytes,
-    String name = 'default',
+    required String ip,
   }) async {
     if (await bluetoothConnected) {
       await PrintBluetoothThermal.writeBytes(bytes);
     } else {
-      final profile = await CapabilityProfile.load(name: name);
-      final generator = Generator(PaperSize.mm80, profile);
-      generator.textEncoded(bytes);
-      generator.feed(2);
-      generator.cut();
+      const PaperSize paper = PaperSize.mm80;
+      final profile = await CapabilityProfile.load();
+      final generator = Generator(paper, profile);
+      final printer = NetworkPrinter(paper, profile);
+
+      final PosPrintResult res = await printer.connect(ip, port: 9100);
+
+      if (res == PosPrintResult.success) {
+        generator.textEncoded(bytes);
+        generator.feed(2);
+        generator.cut();
+      }
     }
   }
 }

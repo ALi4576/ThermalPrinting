@@ -12,8 +12,9 @@ dependencies:
     sdk: flutter
   
   cupertino_icons: ^1.0.6
-  esc_pos_utils_plus: ^2.0.3
   print_bluetooth_thermal: ^1.1.0
+  esc_pos_printer: ^4.1.0
+  esc_pos_utils: ^1.1.0
 
 dev_dependencies:
   flutter_test:
